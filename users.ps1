@@ -1,5 +1,5 @@
 # NOTE: no need to test connection for LastLoggedOnUser
-
+# NOTE: checkin filepath is not the best way to verify if something is installed
 # file containing computer names
 $computerNamesFile = "C:\temp\banana.txt"
 
