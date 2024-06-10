@@ -1,6 +1,7 @@
 # NOTE: no need to test connection for LastLoggedOnUser
-# NOTE: checkin filepath is not the best way to verify if something is installed
+# NOTE: checking filepath is not the best way to verify if something is installed XD
 # file containing computer names
+
 $computerNamesFile = "C:\temp\banana.txt"
 
 # if the file exists
@@ -24,13 +25,11 @@ foreach ($computerName in $computerNames) {
  	# Gets the Service Tags for the PCs in the list
 	$serialNumber = Add-Content -Path ".\OUs.txt" ((Get-WmiObject Win32_BIOS -ComputerName $computerName).SerialNumber)
 
-	# If the PC has VISUAL STUDIO (Office 2021, I think)
-	$visio = Invoke-Command -ComputerName $computerName -ScriptBlock { Test-Path "C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\devenv.exe" }
-	# OR has VISUAL STUDIO (Office 365, I think)
+	# has VISIO 2019 executable
 	$visio = Invoke-Command -ComputerName $computerName -ScriptBlock { Test-Path "C:\Program Files\Microsoft Office\root\Office16\VISIO.exe" }
         Add-Content -Path ".\VISIO.txt" -Value "${visio}"
 
-	# If the PC has MSProject (for Office 2019 install, I think)
+	# If the PC has MSProject executable (for Office 2019 install, I think)
 	$project = Invoke-Command -ComputerName $computerName -ScriptBlock { Test-Path "C:\Program Files\Microsoft Office\root\Office16\WINPROJ.exe" } 
 	Add-Content -Path ".\MSproject.txt" -Value "${MSproject}"
 
@@ -50,7 +49,7 @@ foreach ($computerName in $computerNames) {
     } else {
 
 	# used to place gaps for PCs that cannot be pinged
- 	# uncomment the one's being used I guess
+ 	# uncomment the one's being used, I guess
 
         #Add-Content -Path ".\OUs.txt" -Value "NULL"
         #Add-Content -Path ".\SERIALs.txt" -Value "NULL"
