@@ -12,25 +12,26 @@ if (-not (Test-Path $computerNamesFile)) {
 
 # Read computer names from the file
 $computerNames = Get-Content $computerNamesFile
-
+$counter = 0
 # Loopy loop
 foreach ($computerName in $computerNames) {
+	$counter++
     # Check if the computer is reachable
     if (Test-Connection -ComputerName $computerName -Count 1 -Quiet) {
-
-	
+	<#
 	
 	# Gets the OUs for the PCs in the list
 	$ou = Add-Content -Path ".\OUs.txt" ((Get-EMComputerDetails $computerName | find "ECN Computers"))
- 	# Gets the Service Tags for the PCs in the list
 	$serialNumber = Add-Content -Path ".\OUs.txt" ((Get-WmiObject Win32_BIOS -ComputerName $computerName).SerialNumber)
 
-	# has VISIO 2019 executable
+	# If the PC has VISUAL STUDIO
+	$visio = Invoke-Command -ComputerName $computerName -ScriptBlock { Test-Path "C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\devenv.exe" }
+	# OR
 	$visio = Invoke-Command -ComputerName $computerName -ScriptBlock { Test-Path "C:\Program Files\Microsoft Office\root\Office16\VISIO.exe" }
         Add-Content -Path ".\VISIO.txt" -Value "${visio}"
 
-	# If the PC has MSProject executable (for Office 2019 install, I think)
-	$project = Invoke-Command -ComputerName $computerName -ScriptBlock { Test-Path "C:\Program Files\Microsoft Office\root\Office16\WINPROJ.exe" } 
+	# If the PC has MSProject (for Office 2019 install)
+	$MSproject = Invoke-Command -ComputerName $computerName -ScriptBlock { Test-Path "C:\Program Files\Microsoft Office\root\Office16\WINPROJ.exe" } 
 	Add-Content -Path ".\MSproject.txt" -Value "${MSproject}"
 
 	
@@ -43,18 +44,46 @@ foreach ($computerName in $computerNames) {
 
 	
 
-	$visio = Invoke-Command -ComputerName $computerName -ScriptBlock { Test-Path "C:\Program Files\Microsoft Office\root\Office16\VISIO.exe" } # VISIO Office 2019 I think
-        Add-Content -Path ".\VISIO.txt" -Value "${visio}"
+	#$visio = Invoke-Command -ComputerName $computerName -ScriptBlock { Test-Path "C:\Program Files\Microsoft Office\root\Office16\VISIO.exe" } # VISIO Office 2019 I think
+
+	$visio = Invoke-Command -ComputerName $computerName -ScriptBlock { Get-WmiObject -Query "SELECT * FROM Win32_Product" | Where-Object { $_.Name -like "*Visual Studio*" } }
+
+	if ($visio -like "*Studio*") {
+        Add-Content -Path ".\VISIO.txt" -Value "TRUE"
+	} else {
+		Add-Content -Path ".\VISIO.txt" -Value "FALSE"
+	}
+	
+	
+	# If the PC has Office 2021
+	if ((Invoke-Command -ComputerName $computerName -ScriptBlock { Test-Path "C:\Program Files\Microsoft Office\root\rsod\officemuiset.msi.16.en-us.boot.tree.dat" }) -and -not (Invoke-Command -ComputerName X-MJIS2083DPC4 -ScriptBlock { Test-Path "C:\Program Files\Microsoft Office\root\mcxml\AppVIsvSubsystems32.dll" })) {
+        Add-Content -Path ".\ms2019.txt" -Value "2021"
+	} elseif (Invoke-Command -ComputerName $computerName -ScriptBlock { Test-Path "C:\Program Files\Microsoft Office\root\mcxml\AppVIsvSubsystems32.dll" }) {
+		Add-Content -Path ".\ms2019.txt" -Value "2019"
+	} else {
+	Add-Content -Path ".\ms2019.txt" -Value "365"
+	}#>
+
+	# If the PC has Office 2019
+	if (Invoke-Command -ComputerName $computerName -ScriptBlock { Test-Path "C:\Program Files\Microsoft Office\root\mcxml\AppVIsvSubsystems32.dll" }) {
+		Add-Content -Path ".\ms2019.txt" -Value "2019"
+	} else {
+	Add-Content -Path ".\ms2019.txt" -Value "NULL"
+	}
+
 
     } else {
 
+
 	# used to place gaps for PCs that cannot be pinged
- 	# uncomment the one's being used, I guess
 
         #Add-Content -Path ".\OUs.txt" -Value "NULL"
         #Add-Content -Path ".\SERIALs.txt" -Value "NULL"
-	Add-Content -Path ".\VISIO.txt" -Value "NULL"
+	#Add-Content -Path ".\VISIO.txt" -Value "NULL"
 	#Add-Content -Path ".\MSproject.txt" -Value "NULL"
 	#Add-Content -Path ".\userss.txt" -Value "NULL"
+	Add-Content -Path ".\ms2019.txt" -Value "NULL"
     }
+	Write-Output "$counter"
 }
+
