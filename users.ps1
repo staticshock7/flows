@@ -43,8 +43,8 @@ foreach ($computerName in $computerNames) {
 	Add-Content -Path ".\userss.txt" (($line2))
 
 	
-
-	#$visio = Invoke-Command -ComputerName $computerName -ScriptBlock { Test-Path "C:\Program Files\Microsoft Office\root\Office16\VISIO.exe" } # VISIO Office 2019 I think
+	<#### IGNORE THIS ####
+	$visio = Invoke-Command -ComputerName $computerName -ScriptBlock { Test-Path "C:\Program Files\Microsoft Office\root\Office16\VISIO.exe" } # VISIO Office 2019 I think
 
 	$visio = Invoke-Command -ComputerName $computerName -ScriptBlock { Get-WmiObject -Query "SELECT * FROM Win32_Product" | Where-Object { $_.Name -like "*Visual Studio*" } }
 
@@ -52,7 +52,9 @@ foreach ($computerName in $computerNames) {
         Add-Content -Path ".\VISIO.txt" -Value "TRUE"
 	} else {
 		Add-Content -Path ".\VISIO.txt" -Value "FALSE"
-	} #>
+	} 
+ 	#### IGNORE THIS ####>
+ 	#>
 	
 
 	# If the PC has Office 2021
