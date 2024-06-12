@@ -36,7 +36,7 @@ foreach ($computerName in $computerNames) {
 
 	
 
-	# Gets the very last last logon users from a list of users
+	# Gets the very last last logon users from a list of computers
 	$line0 = (Get-AMLastLogin $computerName | Out-String -Stream | Select-String -Pattern 'BOILERAD' | ForEach-Object { $_.Line.Trim() -split "\r?\n" })
 	$line1 = ($line[0] -split '\\')[1]
 	$line2 = ($line2 -split ' ')[0]	
