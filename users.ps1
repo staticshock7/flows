@@ -52,23 +52,25 @@ foreach ($computerName in $computerNames) {
         Add-Content -Path ".\VISIO.txt" -Value "TRUE"
 	} else {
 		Add-Content -Path ".\VISIO.txt" -Value "FALSE"
-	}
+	} #>
 	
-	
-	# If the PC has Office 2021
-	if ((Invoke-Command -ComputerName $computerName -ScriptBlock { Test-Path "C:\Program Files\Microsoft Office\root\rsod\officemuiset.msi.16.en-us.boot.tree.dat" }) -and -not (Invoke-Command -ComputerName X-MJIS2083DPC4 -ScriptBlock { Test-Path "C:\Program Files\Microsoft Office\root\mcxml\AppVIsvSubsystems32.dll" })) {
-        Add-Content -Path ".\ms2019.txt" -Value "2021"
-	} elseif (Invoke-Command -ComputerName $computerName -ScriptBlock { Test-Path "C:\Program Files\Microsoft Office\root\mcxml\AppVIsvSubsystems32.dll" }) {
-		Add-Content -Path ".\ms2019.txt" -Value "2019"
-	} else {
-	Add-Content -Path ".\ms2019.txt" -Value "365"
-	}#>
 
+	# If the PC has Office 2021
+	if ((Invoke-Command -ComputerName $computerName -ScriptBlock { Test-Path "C:\Program Files\Microsoft Office\root\rsod\officemuiset.msi.16.en-us.boot.tree.dat" }) -and -not (Invoke-Command -ComputerName $ComputerName -ScriptBlock { Test-Path "C:\Program Files\Microsoft Office\root\mcxml\AppVIsvSubsystems32.dll" })) {
+        Add-Content -Path ".\ms2019.txt" -Value "2021"
+		$t1 = $true
+	} else {
+		$t1 = $false
+	}
 	# If the PC has Office 2019
 	if (Invoke-Command -ComputerName $computerName -ScriptBlock { Test-Path "C:\Program Files\Microsoft Office\root\mcxml\AppVIsvSubsystems32.dll" }) {
 		Add-Content -Path ".\ms2019.txt" -Value "2019"
+		$t2 = $true
 	} else {
-	Add-Content -Path ".\ms2019.txt" -Value "NULL"
+		$t2 = $false
+	}
+	if ( -not $t1 -and -not $t2 ) {
+		Add-Content -Path ".\ms2019.txt" -Value "365"
 	}
 
 
