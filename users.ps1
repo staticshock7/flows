@@ -20,7 +20,7 @@ foreach ($computerName in $computerNames) {
     if (Test-Connection -ComputerName $computerName -Count 1 -Quiet) {
 	<#
 	
-	# Gets the OUs for the PCs in the list
+	
 	$ou = Add-Content -Path ".\OUs.txt" ((Get-EMComputerDetails $computerName | find "ECN Computers"))
 	$serialNumber = Add-Content -Path ".\OUs.txt" ((Get-WmiObject Win32_BIOS -ComputerName $computerName).SerialNumber)
 
