@@ -1,0 +1,34 @@
+$computerNamesFile = "C:\temp\xyz\banana.txt"
+
+# Read computer names from the file
+$computerNames = Get-Content $computerNamesFile
+$counter = 0
+
+foreach ($computerName in $computerNames) {
+    $counter++
+    $result = $null  # default to NULL
+
+    $lines = Get-AMLastLogin $computerName | Out-String -Stream | Select-String -Pattern 'XYZAD'
+
+    if ($lines) {
+        $line = $lines[0].Line.Trim()
+
+        if ($line -match '\\') {
+            $line1 = ($line -split '\\')[1]
+
+            if ($line1 -match ' ') {
+                $line2 = ($line1 -split ' ')[0]
+                $result = $line2  # only assign if we successfully extract it
+            }
+        }
+    }
+
+    #NULL if not found
+    if ($null -eq $result) {
+        Add-Content -Path ".\userss.txt" "NULL"
+    } else {
+        Add-Content -Path ".\userss.txt" $result
+    }
+
+    Write-Output "$counter"
+}
